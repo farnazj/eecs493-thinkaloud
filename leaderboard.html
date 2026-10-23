@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Worst Facilitator Leaderboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a projector screen. Top scores on the left, where the room went wrong on the right. */
+:root {
+  --bg: #f3f1ee;
+  --surface: #ffffff;
+  --ink: #1f1b24;
+  --muted: #6b6473;
+  --line: #e2ddd8;
+  --accent: #d6336c;
+  --accent-soft: #fbe4ec;
+  --good: #2b8a5e;
+  --good-soft: #e1f3ea;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17141b; --surface: #221e27; --ink: #f1edf4; --muted: #a79fb0; --line: #3a3441;
+  --accent: #ff6b9a; --accent-soft: #4a2132; --good: #5fd39a; --good-soft: #1d3a2c; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #17141b; --surface: #221e27; --ink: #f1edf4; --muted: #a79fb0; --line: #3a3441;
+  --accent: #ff6b9a; --accent-soft: #4a2132; --good: #5fd39a; --good-soft: #1d3a2c; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.45; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; }
+
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px 32px; flex-wrap: wrap; margin-bottom: 28px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 5vw, 56px); line-height: 1; letter-spacing: -.02em; margin: 0; }
+h1 em { font-style: normal; color: var(--accent); }
+.course { font-weight: 700; color: var(--muted); margin: 0 0 6px; }
+.status { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; color: var(--muted); }
+.players { font-family: var(--display); font-weight: 800; font-size: 40px; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
+.players small { font-family: var(--body); font-weight: 400; font-size: 17px; color: var(--muted); }
+.toggle { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 15px; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0 0 14px; }
+
+.top { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.top li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; }
+.top li:first-child { border-color: var(--accent); background: var(--accent-soft); }
+.pos { font-family: var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.who { min-width: 0; }
+.who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 20px; }
+.who span { font-size: 14px; color: var(--muted); }
+.pts { font-family: var(--display); font-weight: 800; font-size: 30px; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.rounds { display: grid; gap: 10px; }
+.round { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: grid; gap: 8px; }
+.rhead { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.rhead b { font-size: 19px; }
+.rnum { font-family: var(--mono); font-size: 14px; color: var(--muted); margin-right: 8px; }
+.bar { display: flex; height: 12px; border-radius: 99px; overflow: hidden; background: var(--accent); }
+.bar span { background: var(--good); }
+.rfoot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 15px; color: var(--muted); }
+.rfoot .ok { color: var(--good); font-weight: 700; }
+.rfoot .sin { color: var(--accent); font-weight: 700; }
+
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 28px; color: var(--muted); }
+.empty code { font-family: var(--mono); color: var(--ink); word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="course">EECS 493: User Interface Development</p>
+      <h1>Worst Facilitator <em>leaderboard</em></h1>
+    </div>
+    <div class="status">
+      <div class="players" id="players">0 <small>players</small></div>
+      <button class="toggle" id="names" aria-pressed="false">Hide names</button>
+    </div>
+  </header>
+  <main id="board"></main>
+</div>
+
+<script src="config.js"></script>
+<script src="rounds.js"></script>
+<script>
+const MAX = ROUNDS.reduce((s, r) => s + Math.max(...r.opts.map(o => o.p)), 0);
+const RANKS = [[0.85, 'Usability Saboteur'], [0.6, 'Chaos Moderator'], [0.3, 'Accidentally Helpful'], [0, 'Annoyingly Good Facilitator']];
+const GAME_URL = 'farnazj.github.io/eecs493-thinkaloud/facilitator.html';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const board = document.getElementById('board');
+let hideNames = false, lastRows = [];
+
+document.getElementById('names').onclick = e => {
+  hideNames = !hideNames;
+  e.currentTarget.setAttribute('aria-pressed', hideNames);
+  e.currentTarget.textContent = hideNames ? 'Show names' : 'Hide names';
+  render(lastRows);
+};
+
+function render(rows) {
+  lastRows = rows;
+  document.getElementById('players').innerHTML = `${rows.length} <small>player${rows.length === 1 ? '' : 's'}</small>`;
+  if (!rows.length) {
+    board.innerHTML = `<div class="empty">Waiting for the first scores. Open <code>${GAME_URL}</code> and play a round.</div>`;
+    return;
+  }
+  const top = [...rows].sort((a, b) => b.score - a.score || a.t - b.t).slice(0, 10);
+  const stats = ROUNDS.map((R, r) => {
+    const counts = R.opts.map(() => 0);
+    rows.forEach(row => { const k = Number(row.picks.split(',')[r]); if (k in counts) counts[k]++; });
+    const total = counts.reduce((a, b) => a + b, 0) || 1;
+    const bestIdx = R.opts.findIndex(o => o.best);
+    const bad = counts.map((n, k) => ({ n, k })).filter(x => x.k !== bestIdx).sort((a, b) => b.n - a.n)[0];
+    return { R, r, goodPct: Math.round(100 * counts[bestIdx] / total), bad, total };
+  });
+  board.innerHTML = `
+    <div class="grid">
+      <section>
+        <h2>Top saboteurs</h2>
+        <ol class="top">${top.map((row, n) => {
+          const rank = RANKS.find(([t]) => row.score / MAX >= t)[1];
+          return `<li><span class="pos">#${n + 1}</span>
+            <span class="who"><b>${hideNames ? 'Player ' + (n + 1) : esc(row.name)}</b><span>${rank}</span></span>
+            <span class="pts">${row.score}</span></li>`;
+        }).join('')}</ol>
+      </section>
+      <section>
+        <h2>How the room sabotaged Riley</h2>
+        <div class="rounds">${stats.map(s => {
+          const o = s.bad && s.bad.n ? s.R.opts[s.bad.k] : null;
+          return `<div class="round">
+            <div class="rhead"><b><span class="rnum">${s.r + 1}</span>${esc(s.R.label)}</b></div>
+            <div class="bar" role="img" aria-label="${s.goodPct}% played it straight"><span style="width:${s.goodPct}%"></span></div>
+            <div class="rfoot"><span><span class="ok">${s.goodPct}%</span> played it straight</span>
+              ${o ? `<span>Favorite sabotage: <span class="sin">${esc(o.tag)}</span> (${Math.round(100 * s.bad.n / s.total)}%)</span>` : ''}</div>
+          </div>`;
+        }).join('')}</div>
+      </section>
+    </div>`;
+}
+
+async function refresh() {
+  try { render(await boardFetch()); }
+  catch (e) { if (!lastRows.length) board.innerHTML = `<div class="empty">Can't reach the leaderboard right now. Retrying…</div>`; }
+}
+
+if (!BOARD_URL) {
+  board.innerHTML = `<div class="empty">The leaderboard isn't connected yet. Add the Apps Script web app URL to <code>config.js</code>.</div>`;
+} else {
+  refresh();
+  setInterval(refresh, 5000);
+}
+</script>
+</body>
+</html>
