@@ -1,6 +1,6 @@
 // Web app URL of the Google Apps Script that stores leaderboard scores (see apps_script.gs).
 // Leave empty to run the game without a leaderboard.
-const BOARD_URL = '';
+const BOARD_URL = 'https://script.google.com/macros/s/AKfycbzNAvnktDCDVIqLfzNh8EXYbsfZ3bySf0eA3c0QfgGSeEBAen7ERHJ8dpgwwQOzp24aOA/exec';
 // Only scores from this many recent hours count, so each lecture gets a fresh board.
 const BOARD_HOURS = 3;
 
