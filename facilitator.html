@@ -54,6 +54,7 @@ h1 em { font-style: normal; color: var(--accent); }
 .brief dd { margin: 0 0 6px; }
 .go { background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 14px 22px; font-weight: 700; font-size: 17px; cursor: pointer; }
 
+.course { font-size: 15px; font-weight: 700; color: var(--muted); margin: 0 0 4px; }
 .round-label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
 .context { color: var(--muted); font-style: italic; margin: 0 0 12px; }
 .bubble { background: var(--bubble); border-radius: 4px 16px 16px 16px; padding: 14px 18px; font-size: 18px; margin: 0 0 22px; max-width: 92%; }
@@ -257,7 +258,7 @@ function hud() {
 function intro() {
   i = -1; score = 0; picks.length = 0; hud();
   app.innerHTML = `
-    <p class="round-label">Think-aloud training · EECS 493</p>
+    <p class="course">EECS 493: User Interface Development</p>
     <h1>Be the <em>worst</em> facilitator.</h1>
     <p class="lede">You're running a think-aloud session. Your goal is to ruin it. Every choice that biases, rescues, or rattles the participant earns bias points. The highest score wins.</p>
     <dl class="brief">
