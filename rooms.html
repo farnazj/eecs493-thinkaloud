@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Northgate Rooms</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #1d2733;
+  --muted: #66727f;
+  --line: #dde3e9;
+  --brand: #2f5d8a;
+  --brand-soft: #e7eef6;
+  --held: #a86a00;
+  --held-soft: #fff3dc;
+  --ok: #1f7a4d;
+  --ok-soft: #e3f4ea;
+  --busy: #e9edf1;
+  --err: #b3261e;
+  --err-soft: #fdecea;
+  --font: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; }
+button { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.appbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.appbar-inner, main { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.appbar-inner { display: flex; align-items: center; gap: 24px; height: 60px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .01em; }
+.logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; }
+.logo small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: 0; }
+nav { display: flex; gap: 4px; flex: 1; }
+nav button { background: none; border: 0; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--muted); font-weight: 500; }
+nav button[aria-current="page"] { color: var(--brand); background: var(--brand-soft); }
+.avatar-wrap { position: relative; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; border: 0; background: #c9d6e3; font-weight: 600; font-size: 13px; cursor: pointer; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(20,30,40,.12); min-width: 230px; padding: 6px; z-index: 20; }
+.menu button, .menu .menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+.menu button:hover { background: var(--bg); }
+.menu .menu-row { cursor: default; color: var(--muted); font-size: 12.5px; }
+.menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+
+main { padding-block: 24px 64px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 20px; }
+
+.filters { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: flex-end; margin-bottom: 20px; }
+.fgroup label, .fgroup .flabel { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.dates { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.amen { display: flex; gap: 6px; }
+.icon-btn { width: 38px; height: 36px; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
+.icon-btn[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); }
+.icon-btn svg, .amen-icons svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 20px; align-items: start; }
+@media (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.count { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+.rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.room { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0; cursor: pointer; text-align: left; overflow: hidden; display: flex; flex-direction: column; }
+.room:hover { border-color: #b9c6d3; }
+.room[aria-pressed="true"] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft); }
+.thumb { height: 74px; background: linear-gradient(135deg, #dbe5ee, #c3d3e2); position: relative; }
+.thumb span { position: absolute; left: 12px; bottom: 8px; font-size: 12px; color: #3d5267; font-weight: 600; }
+.room-body { padding: 12px 14px 14px; display: grid; gap: 6px; }
+.room-name { font-weight: 600; }
+.room-meta { color: var(--muted); font-size: 13px; }
+.amen-icons { display: flex; gap: 8px; }
+.amen-icons svg { width: 16px; height: 16px; stroke: var(--muted); }
+.open { font-size: 13px; color: var(--ok); font-weight: 500; }
+.open.none { color: var(--muted); }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 28px; color: var(--muted); text-align: center; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); }
+.panel h2 { font-size: 17px; margin: 0 0 2px; }
+.panel .room-meta { margin-bottom: 14px; }
+.slots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 16px; }
+.slot { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 8px 0; font-size: 13px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.slot:disabled { background: var(--busy); color: #9aa5b1; cursor: not-allowed; text-decoration: line-through; }
+.slot[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.panel-foot { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.small { font-size: 12.5px; color: var(--muted); }
+.btn { border: 0; background: var(--brand); color: #fff; padding: 10px 16px; border-radius: 7px; font-weight: 600; cursor: pointer; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.err { background: var(--err-soft); color: var(--err); border-radius: 6px; padding: 9px 11px; font-size: 13px; font-family: ui-monospace, Menlo, monospace; }
+
+.res-list { display: grid; gap: 10px; max-width: 760px; }
+.res { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.res-main { min-width: 0; }
+.res-title { font-weight: 600; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px; }
+.status.held { background: var(--held-soft); color: var(--held); }
+.status.confirmed { background: var(--ok-soft); color: var(--ok); }
+.status.expired, .status.released { background: var(--busy); color: var(--muted); }
+.res-right { display: flex; align-items: center; gap: 12px; position: relative; }
+.linkish { background: none; border: 0; color: #8c97a3; font-size: 12.5px; cursor: pointer; padding: 2px; }
+.more { width: 32px; height: 32px; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; cursor: pointer; font-size: 18px; line-height: 1; }
+details.past summary { cursor: pointer; color: var(--muted); font-size: 14px; margin: 18px 0 10px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 8px; display: flex; gap: 16px; align-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 50; max-width: calc(100% - 32px); }
+.toast.good { background: var(--ok); }
+.toast button { background: none; border: 0; color: #fff; font-weight: 700; text-decoration: underline; cursor: pointer; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: up .2s ease-out; } @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } } }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="logo">
+      <div class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v18M13 12h3"/></svg></div>
+      <div>Northgate Rooms<small>Northgate Library · Study spaces</small></div>
+    </div>
+    <nav>
+      <button id="nav-find" aria-current="page">Find a room</button>
+      <button id="nav-res">My reservations</button>
+    </nav>
+    <div class="avatar-wrap">
+      <button class="avatar" id="avatar" aria-haspopup="true" aria-expanded="false">JR</button>
+      <div class="menu" id="avatar-menu" hidden></div>
+    </div>
+  </div>
+</header>
+
+<main id="view"></main>
+<div id="toast-root"></div>
+
+<script>
+// ---------- Icons ----------
+const ICONS = {
+  whiteboard: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20l2-4M16 20l-2-4"/></svg>',
+  screen: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M9 20h6M12 16v4"/></svg>',
+  outlet: '<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+  quiet: '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>',
+};
+const AMEN_TIP = { whiteboard: 'Writable surface', screen: 'Display', outlet: 'Power', quiet: 'Silent zone' };
+
+// ---------- Dates ----------
+const today = new Date(); today.setHours(0,0,0,0);
+const DAYS = Array.from({ length: 7 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
+const thursdayIdx = DAYS.findIndex(d => d.getDay() === 4);
+const fmtShort = d => `${d.getMonth()+1}/${d.getDate()}`;
+const fmtLong = d => d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+const fmtHour = h => { const hh = Math.floor(h), m = h % 1 ? '30' : '00'; const ap = hh >= 12 ? 'PM' : 'AM'; return `${((hh + 11) % 12) + 1}:${m} ${ap}`; };
+
+// ---------- Rooms ----------
+const HOURS = Array.from({ length: 13 }, (_, i) => 8 + i); // 8 AM .. 8 PM starts
+const ROOMS = [
+  { id: '2.104', floor: 2, seats: 2, amen: ['outlet', 'quiet'] },
+  { id: '2.110', floor: 2, seats: 4, amen: ['screen', 'outlet'] },
+  { id: '2.112', floor: 2, seats: 4, amen: ['whiteboard', 'outlet'] },
+  { id: '3.201', floor: 3, seats: 6, amen: ['whiteboard', 'screen'] },
+  { id: '3.205', floor: 3, seats: 6, amen: ['quiet', 'outlet'] },
+  { id: '3.220', floor: 3, seats: 8, amen: ['whiteboard', 'screen', 'outlet'] },
+  { id: '1.010', floor: 1, seats: 10, amen: ['screen'] },
+];
+// booked[roomId][dayIdx] = Set of start hours already taken by other people
+const booked = {};
+const seed = (r, d) => ((r * 7 + d * 13) % 5);
+ROOMS.forEach((room, r) => {
+  booked[room.id] = DAYS.map((_, d) => {
+    const s = new Set();
+    HOURS.forEach(h => { if ((h + seed(r, d)) % 4 === 0) s.add(h); });
+    return s;
+  });
+});
+if (thursdayIdx >= 0) {
+  const T = thursdayIdx;
+  const set = (id, hrs) => { booked[id][T] = new Set(hrs); };
+  set('2.110', [9, 11, 17]);
+  set('2.112', [10, 14, 18]);
+  set('3.201', [8, 12, 17, 19]);
+  set('3.205', [13, 14, 15]);
+  set('3.220', [12, 13, 14, 15, 16]);
+  set('1.010', [14, 15]);
+}
+
+// ---------- State ----------
+const state = {
+  view: 'find',
+  day: 0,
+  seats: 'any',
+  amen: new Set(),
+  room: null,
+  start: null,
+  duration: 1,
+  error: '',
+  reservations: [],
+  nextId: 4021,
+};
+const PAST_HOURS = 4; // used earlier this week
+const ALLOWANCE = 10;
+
+// ---------- Render helpers ----------
+const $ = sel => document.querySelector(sel);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function filteredRooms() {
+  return ROOMS.filter(r =>
+    (state.seats === 'any' || r.seats === Number(state.seats)) &&
+    [...state.amen].every(a => r.amen.includes(a)));
+}
+function openCount(room) { return HOURS.filter(h => !booked[room.id][state.day].has(h)).length; }
+
+function renderFind() {
+  const rooms = filteredRooms();
+  const room = ROOMS.find(r => r.id === state.room);
+  $('#view').innerHTML = `
+    <h1>Find a study room</h1>
+    <p class="sub">Group rooms can be held for up to 3 hours per day.</p>
+    <section class="filters" aria-label="Filters">
+      <div class="fgroup"><span class="flabel">Date</span>
+        <div class="dates">${DAYS.map((d, i) => `<button class="chip" data-day="${i}" aria-pressed="${i === state.day}">${fmtShort(d)}</button>`).join('')}</div>
+      </div>
+      <div class="fgroup"><label for="seats">Occupancy</label>
+        <select id="seats">${['any', 2, 4, 6, 8, 10].map(v => `<option value="${v}" ${String(v) === String(state.seats) ? 'selected' : ''}>${v === 'any' ? 'Any' : v}</option>`).join('')}</select>
+      </div>
+      <div class="fgroup"><span class="flabel">Features</span>
+        <div class="amen">${Object.keys(ICONS).map(a => `<button class="icon-btn" data-amen="${a}" title="${AMEN_TIP[a]}" aria-label="${AMEN_TIP[a]}" aria-pressed="${state.amen.has(a)}">${ICONS[a]}</button>`).join('')}</div>
+      </div>
+    </section>
+    <div class="layout">
+      <section>
+        <p class="count">${rooms.length} room${rooms.length === 1 ? '' : 's'}</p>
+        ${rooms.length ? `<div class="rooms">${rooms.map(r => {
+          const n = openCount(r);
+          return `<button class="room" data-room="${r.id}" aria-pressed="${r.id === state.room}">
+            <div class="thumb"><span>Floor ${r.floor}</span></div>
+            <div class="room-body">
+              <div class="room-name">Room ${r.id}</div>
+              <div class="room-meta">${r.seats} seats</div>
+              <div class="amen-icons">${r.amen.map(a => `<span title="${AMEN_TIP[a]}">${ICONS[a]}</span>`).join('')}</div>
+              <div class="open ${n ? '' : 'none'}">${n ? `${n} open slots` : 'Fully booked'}</div>
+            </div></button>`;
+        }).join('')}</div>` : `<div class="empty">No rooms match.</div>`}
+      </section>
+      <aside class="panel" aria-label="Booking">${room ? panelHTML(room) : `<p class="small" style="margin:0">Select a room to see open times.</p>`}</aside>
+    </div>`;
+
+  document.querySelectorAll('[data-day]').forEach(b => b.onclick = () => {
+    state.day = Number(b.dataset.day);
+    state.seats = 'any'; state.amen.clear(); state.start = null; state.error = '';
+    if (state.room && !ROOMS.find(r => r.id === state.room)) state.room = null;
+    render();
+  });
+  $('#seats').onchange = e => { state.seats = e.target.value; state.error = ''; render(); };
+  document.querySelectorAll('[data-amen]').forEach(b => b.onclick = () => {
+    const a = b.dataset.amen; state.amen.has(a) ? state.amen.delete(a) : state.amen.add(a); render();
+  });
+  document.querySelectorAll('[data-room]').forEach(b => b.onclick = () => {
+    state.room = b.dataset.room; state.start = null; state.error = ''; render();
+  });
+  if (room) wirePanel(room);
+}
+
+function panelHTML(room) {
+  const taken = booked[room.id][state.day];
+  return `
+    <h2>Room ${room.id}</h2>
+    <div class="room-meta">${room.seats} seats · Floor ${room.floor} · ${fmtShort(DAYS[state.day])}</div>
+    <div class="slots">${HOURS.map(h => `<button class="slot" data-start="${h}" ${taken.has(h) ? 'disabled' : ''} aria-pressed="${state.start === h}">${fmtHour(h).replace(':00', '')}</button>`).join('')}</div>
+    <div class="panel-foot">
+      <div class="row"><span class="small">${state.start == null ? 'Pick a start time' : `Starts ${fmtHour(state.start)}`}</span></div>
+      ${state.error ? `<div class="err">${esc(state.error)}</div>` : ''}
+      <div class="row">
+        <label class="small" for="dur">Length
+          <select id="dur">${[0.5, 1, 1.5, 2, 3].map(v => `<option value="${v}" ${v === state.duration ? 'selected' : ''}>${v < 1 ? '30 min' : v + ' hr'}</option>`).join('')}</select>
+        </label>
+        <button class="btn" id="hold" ${state.start == null ? 'disabled' : ''}>Hold room</button>
+      </div>
+    </div>`;
+}
+
+function wirePanel(room) {
+  document.querySelectorAll('[data-start]').forEach(b => b.onclick = () => {
+    state.start = Number(b.dataset.start); state.error = ''; render();
+  });
+  $('#dur').onchange = e => { state.duration = Number(e.target.value); state.error = ''; render(); };
+  $('#hold').onclick = () => {
+    const taken = booked[room.id][state.day];
+    const end = state.start + state.duration;
+    const hrs = HOURS.filter(h => h >= state.start && h < end);
+    if (end > 21 || hrs.some(h => taken.has(h))) {
+      state.error = `RSV-409: Requested interval overlaps an existing hold on resource ${room.id}.`;
+      return render();
+    }
+    hrs.forEach(h => taken.add(h));
+    state.reservations.unshift({
+      id: state.nextId++, room: room.id, day: state.day, start: state.start, duration: state.duration,
+      status: 'held', expires: Date.now() + 10 * 60 * 1000, hours: hrs,
+    });
+    state.start = null;
+    render();
+    toast('Room held ✓', { good: true });
+  };
+}
+
+function hoursUsed() {
+  return PAST_HOURS + state.reservations.filter(r => r.status === 'confirmed' || r.status === 'held').reduce((s, r) => s + r.duration, 0);
+}
+
+function renderRes() {
+  tickExpiry();
+  const upcoming = state.reservations.filter(r => r.status === 'held' || r.status === 'confirmed');
+  const other = state.reservations.filter(r => r.status === 'expired' || r.status === 'released');
+  const card = r => {
+    const d = DAYS[r.day];
+    let status = '';
+    if (r.status === 'held') {
+      const left = Math.max(0, r.expires - Date.now());
+      const mm = Math.floor(left / 60000), ss = String(Math.floor(left / 1000) % 60).padStart(2, '0');
+      status = `<span class="status held">Held · ${mm}:${ss}</span><button class="linkish" data-confirm="${r.id}">confirm</button>`;
+    } else {
+      status = `<span class="status ${r.status}">${r.status[0].toUpperCase() + r.status.slice(1)}</span>`;
+    }
+    const canAct = r.status === 'held' || r.status === 'confirmed';
+    return `<div class="res">
+      <div class="res-main">
+        <div class="res-title">Room ${r.room} · ${fmtLong(d)}</div>
+        <div class="small">${fmtHour(r.start)} – ${fmtHour(r.start + r.duration)} · #${r.id}</div>
+      </div>
+      <div class="res-right">${status}
+        ${canAct ? `<button class="more" data-more="${r.id}" aria-label="More actions" aria-haspopup="true">⋯</button>
+        <div class="menu" data-menu="${r.id}" hidden>
+          <button data-details="${r.id}">Details</button>
+          ${r.status === 'held' ? `<button data-extend="${r.id}">Extend hold</button>` : ''}
+          <hr><button data-release="${r.id}">Release</button>
+        </div>` : ''}
+      </div></div>`;
+  };
+  $('#view').innerHTML = `
+    <h1>My reservations</h1>
+    <p class="sub">Upcoming bookings at Northgate Library.</p>
+    <div class="res-list">
+      ${upcoming.length ? upcoming.map(card).join('') : `<div class="empty">No upcoming reservations.</div>`}
+    </div>
+    <details class="past"><summary>Past and inactive (${other.length + 2})</summary>
+      <div class="res-list">
+        ${other.map(card).join('')}
+        <div class="res"><div class="res-main"><div class="res-title">Room 2.110 · Earlier this week</div><div class="small">10:00 AM – 12:00 PM · #4012</div></div><span class="status released">Completed</span></div>
+        <div class="res"><div class="res-main"><div class="res-title">Room 3.205 · Earlier this week</div><div class="small">3:00 PM – 5:00 PM · #4017</div></div><span class="status released">Completed</span></div>
+      </div>
+    </details>`;
+
+  document.querySelectorAll('[data-confirm]').forEach(b => b.onclick = () => {
+    const r = state.reservations.find(x => x.id === Number(b.dataset.confirm)); r.status = 'confirmed'; render(); toast('Reservation confirmed');
+  });
+  document.querySelectorAll('[data-more]').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const m = document.querySelector(`[data-menu="${b.dataset.more}"]`); const was = m.hidden;
+    closeMenus(); m.hidden = !was;
+  });
+  document.querySelectorAll('[data-details]').forEach(b => b.onclick = () => { closeMenus(); toast(`Reservation #${b.dataset.details}`); });
+  document.querySelectorAll('[data-extend]').forEach(b => b.onclick = () => {
+    const r = state.reservations.find(x => x.id === Number(b.dataset.extend)); r.expires += 5 * 60 * 1000; closeMenus(); render(); toast('Hold extended 5 min');
+  });
+  document.querySelectorAll('[data-release]').forEach(b => b.onclick = () => {
+    const r = state.reservations.find(x => x.id === Number(b.dataset.release));
+    const prev = r.status;
+    r.status = 'released'; r.hours.forEach(h => booked[r.room][r.day].delete(h));
+    render();
+    toast('Reservation released.', { undo: () => {
+      r.status = prev; r.hours.forEach(h => booked[r.room][r.day].add(h)); render(); toast('Restored');
+    }});
+  });
+}
+
+function tickExpiry() {
+  state.reservations.forEach(r => {
+    if (r.status === 'held' && Date.now() > r.expires) { r.status = 'expired'; r.hours.forEach(h => booked[r.room][r.day].delete(h)); }
+  });
+}
+
+function closeMenus() { document.querySelectorAll('.menu').forEach(m => m.hidden = true); $('#avatar').setAttribute('aria-expanded', 'false'); }
+
+function render() {
+  $('#nav-find').toggleAttribute('aria-current', state.view === 'find');
+  $('#nav-res').toggleAttribute('aria-current', state.view === 'res');
+  if (state.view === 'find') $('#nav-find').setAttribute('aria-current', 'page');
+  if (state.view === 'res') $('#nav-res').setAttribute('aria-current', 'page');
+  state.view === 'find' ? renderFind() : renderRes();
+}
+
+let toastTimer;
+function toast(msg, opts = {}) {
+  clearTimeout(toastTimer);
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast ${opts.good ? 'good' : ''}" role="status"><span>${esc(msg)}</span>${opts.undo ? '<button id="undo">Undo</button>' : ''}</div>`;
+  if (opts.undo) $('#undo').onclick = () => { root.innerHTML = ''; opts.undo(); };
+  toastTimer = setTimeout(() => root.innerHTML = '', opts.undo ? 6000 : 2600);
+}
+
+$('#avatar').onclick = e => {
+  e.stopPropagation();
+  const m = $('#avatar-menu'); const open = m.hidden;
+  closeMenus();
+  if (open) {
+    m.innerHTML = `<div class="menu-row"><strong style="color:var(--ink)">Jamie R.</strong><br>Undergraduate</div><hr>
+      <button>Profile</button><button>Notifications</button>
+      <div class="menu-row">Allowance: ${hoursUsed()} / ${ALLOWANCE} hrs used (week)</div><hr>
+      <button>Sign out</button>`;
+    m.hidden = false; $('#avatar').setAttribute('aria-expanded', 'true');
+  }
+};
+document.addEventListener('click', e => { if (!e.target.closest('.menu')) closeMenus(); });
+$('#nav-find').onclick = () => { state.view = 'find'; render(); };
+$('#nav-res').onclick = () => { state.view = 'res'; render(); };
+setInterval(() => { if (state.view === 'res' && !document.querySelector('.menu:not([hidden])')) renderRes(); }, 1000);
+
+render();
+</script>
+
+</body>
+</html>

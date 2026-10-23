@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Worst Facilitator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: an observation-room transcript. Participant lines on the left, your options below,
+   a running "bias meter" in the header. One column, centered, ~680px. */
+:root {
+  --bg: #f3f1ee;
+  --surface: #ffffff;
+  --ink: #1f1b24;
+  --muted: #6b6473;
+  --line: #e2ddd8;
+  --accent: #d6336c;
+  --accent-soft: #fbe4ec;
+  --good: #2b8a5e;
+  --good-soft: #e1f3ea;
+  --bubble: #ebe7f2;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17141b; --surface: #221e27; --ink: #f1edf4; --muted: #a79fb0; --line: #3a3441;
+  --accent: #ff6b9a; --accent-soft: #4a2132; --good: #5fd39a; --good-soft: #1d3a2c; --bubble: #2f2938; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #17141b; --surface: #221e27; --ink: #f1edf4; --muted: #a79fb0; --line: #3a3441;
+  --accent: #ff6b9a; --accent-soft: #4a2132; --good: #5fd39a; --good-soft: #1d3a2c; --bubble: #2f2938; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 700px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 80px; }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.toprow { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+.score { font-family: var(--mono); font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.score b { color: var(--accent); font-size: 18px; }
+.meter { height: 6px; background: var(--line); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+.meter > div { height: 100%; background: var(--accent); width: 0; transition: width .4s ease; }
+@media (prefers-reduced-motion: reduce) { .meter > div { transition: none; } }
+
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 7vw, 54px); line-height: 1.02; letter-spacing: -.02em; margin: 8px 0 16px; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: 18px; color: var(--muted); max-width: 58ch; }
+.brief { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 22px 0; display: grid; gap: 10px; }
+.brief dt { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.brief dd { margin: 0 0 6px; }
+.go { background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 14px 22px; font-weight: 700; font-size: 17px; cursor: pointer; }
+
+.round-label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
+.context { color: var(--muted); font-style: italic; margin: 0 0 12px; }
+.bubble { background: var(--bubble); border-radius: 4px 16px 16px 16px; padding: 14px 18px; font-size: 18px; margin: 0 0 22px; max-width: 92%; }
+.who { font-family: var(--mono); font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+.prompt { font-weight: 700; margin: 0 0 10px; }
+.opts { display: grid; gap: 10px; }
+.opt { text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 13px 16px; cursor: pointer; font-size: 16px; }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:disabled { cursor: default; opacity: .55; }
+.opt.picked { opacity: 1; border-color: var(--accent); background: var(--accent-soft); }
+.opt.best { opacity: 1; border-color: var(--good); }
+.verdict { margin-top: 18px; border-radius: 12px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 8px; }
+.verdict .pts { font-family: var(--display); font-weight: 800; font-size: 22px; }
+.verdict .pts.bad { color: var(--accent); }
+.verdict .pts.zero { color: var(--good); }
+.tag { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); margin-right: 6px; }
+.tag.goodtag { background: var(--good-soft); color: var(--good); }
+.reaction { font-style: italic; }
+.why { color: var(--muted); }
+.better { border-top: 1px dashed var(--line); padding-top: 8px; }
+.better b { color: var(--good); }
+.next { margin-top: 16px; background: var(--ink); color: var(--bg); border: 0; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; }
+
+.final-score { font-family: var(--display); font-weight: 800; font-size: clamp(64px, 16vw, 112px); line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.final-score small { font-size: .3em; color: var(--muted); }
+.rank { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 6px 0 4px; }
+.sins { display: grid; gap: 8px; margin: 18px 0; padding: 0; list-style: none; }
+.sins li { display: flex; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+.sins li span:last-child { font-family: var(--mono); color: var(--accent); }
+h2 { font-family: var(--display); font-weight: 800; font-size: 22px; margin: 28px 0 10px; }
+.review { display: grid; gap: 10px; }
+.review div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.review .small { font-size: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top" id="hud" hidden>
+    <div class="toprow"><span class="brand">Worst Facilitator</span><span class="score">Bias points <b id="pts">0</b> / <span id="max"></span></span></div>
+    <div class="meter" aria-hidden="true"><div id="bar"></div></div>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+const ROUNDS = [
+  {
+    ctx: 'Riley sits down. You have not started recording yet.',
+    say: '(Riley is looking at you, waiting for instructions.)',
+    prompt: 'How do you open the session?',
+    opts: [
+      { t: '“This app is my baby. I designed every screen myself!”', p: 3, tag: 'Biasing the participant',
+        r: 'Riley: “Oh, cool! I’m sure it’s great.”', why: 'Now Riley knows criticism will hurt your feelings. People soften or hide problems to be polite.' },
+      { t: '“Don’t worry, it’s super easy. Most people finish in a minute.”', p: 3, tag: 'Setting expectations',
+        r: 'Riley: “Okay… no pressure then.”', why: 'If Riley struggles, they will now feel stupid and may stop talking about it.' },
+      { t: '“We’re testing the app, not you. Anything that’s confusing is the app’s fault.”', p: 0, best: true,
+        r: 'Riley relaxes a little.', why: 'This takes the pressure off. Riley is more likely to say when something is confusing.' },
+      { t: '“Let me quickly show you how the map works first, so you don’t get lost.”', p: 4, tag: 'Teaching the interface',
+        r: 'Riley: “Oh nice, thanks!”', why: 'Once you demonstrate the app, you can no longer see whether a new user would figure it out.' },
+    ],
+  },
+  {
+    ctx: 'You are about to start the screen recorder.',
+    say: '(Riley is opening the laptop.)',
+    prompt: 'What about recording?',
+    opts: [
+      { t: '“Is it okay if I record your screen and voice? You can stop at any time.”', p: 0, best: true,
+        r: 'Riley: “Sure, that’s fine.”', why: 'Ask for consent before you record, and remind them they can quit at any time.' },
+      { t: '(Say nothing. The recorder has been running since they walked in.)', p: 4, tag: 'No consent',
+        r: 'Riley later notices the red dot and looks uneasy.', why: 'Recording without consent is an ethics problem, and it damages trust for the rest of the session.' },
+      { t: '“I’m recording, but don’t worry, only my whole team will watch it.”', p: 2, tag: 'No consent',
+        r: 'Riley: “Uh… your whole team?”', why: 'This tells them about the recording but never asks permission, and it makes them more self-conscious.' },
+    ],
+  },
+  {
+    ctx: 'Task 1: “Rent a bike from the station nearest the student union.” Riley opens the Pedal app.',
+    say: 'Okay… so there’s a map. I guess I’m looking for a station? These green dots, maybe?',
+    prompt: 'You respond:',
+    opts: [
+      { t: '“Yep! Those are the stations.”', p: 3, tag: 'Helping',
+        r: 'Riley taps a green dot right away.', why: 'You confirmed the guess. Now you will never know whether the green dots are clear without you there.' },
+      { t: '(Stay quiet and keep taking notes.)', p: 0, best: true,
+        r: 'Riley keeps going: “Let’s try this one…”', why: 'Riley is thinking aloud on their own. Don’t interrupt.' },
+      { t: '“Why did you think the green ones?”', p: 2, tag: 'Interrupting',
+        r: 'Riley stops: “Uh… I don’t know, they looked clickable?”', why: '“Why” questions mid-task make people explain themselves and change how they act. Save them for the debrief.' },
+      { t: '“Great job!”', p: 2, tag: 'Evaluative feedback',
+        r: 'Riley grins and starts asking “Is this right?” after every tap.', why: 'Praise teaches the participant that there are right answers and that you are grading them.' },
+    ],
+  },
+  {
+    ctx: 'Riley has been scrolling the map silently for about 25 seconds.',
+    say: '(…silence…)',
+    prompt: 'You respond:',
+    opts: [
+      { t: '“Hello?? You’re supposed to be talking.”', p: 3, tag: 'Scolding',
+        r: 'Riley: “Sorry! Sorry. Um. I’m scrolling.”', why: 'Scolding makes people anxious and self-conscious. What they say after that is less natural.' },
+      { t: '“Please keep talking. What’s going through your mind?”', p: 0, best: true,
+        r: 'Riley: “I’m trying to find the union, but the map doesn’t have labels.”', why: 'A short, neutral reminder. That one sentence is a usability finding you would have missed.' },
+      { t: '“You’re probably looking for the List view, top right.”', p: 4, tag: 'Helping',
+        r: 'Riley finds it immediately.', why: 'Silence often means they’re stuck, and getting stuck is the data you came for. You just erased it.' },
+      { t: '“Is something confusing you?”', p: 2, tag: 'Leading question',
+        r: 'Riley: “Is it supposed to be confusing?”', why: 'This suggests the answer. Use a neutral prompt like “keep talking.”' },
+    ],
+  },
+  {
+    ctx: 'Riley picked a station and taps the “Unlock” button. Nothing happens.',
+    say: 'Ugh, this Unlock button is grayed out. Is it broken?',
+    prompt: 'You respond:',
+    opts: [
+      { t: '“No, you have to add a payment method first.”', p: 4, tag: 'Helping',
+        r: 'Riley: “Oh! Where do I do that?” (Expects more help now.)', why: 'This is the most important problem in the session, and you just solved it for them. Write it down instead.' },
+      { t: '“Yeah, known bug. Sorry about that.”', p: 3, tag: 'Misleading',
+        r: 'Riley: “Okay, so should I skip this?”', why: 'You gave the participant false information and stopped them from exploring.' },
+      { t: '“What would you do if I weren’t here?”', p: 0, best: true,
+        r: 'Riley: “I’d probably go look in the menu… or give up and walk.”', why: 'You turned the question back without helping. And “give up and walk” is a severity signal.' },
+      { t: '“Interesting! Most people don’t notice that.”', p: 2, tag: 'Comparing to others',
+        r: 'Riley: “Wait, so I’m doing it wrong?”', why: 'Comparing them to other participants makes them feel judged and changes what they do next.' },
+    ],
+  },
+  {
+    ctx: 'Riley sighs and leans back.',
+    say: 'Honestly, I think this is just a bad app.',
+    prompt: 'You respond:',
+    opts: [
+      { t: '“Well, you’re kind of using it wrong.”', p: 4, tag: 'Defensive',
+        r: 'Riley goes quiet and stops criticizing anything.', why: 'You defended the design. From now on Riley will hide problems from you.' },
+      { t: '“Other testers actually liked it a lot.”', p: 3, tag: 'Comparing to others',
+        r: 'Riley: “Oh… okay. Maybe it’s me.”', why: 'This pressures them to agree with the crowd and to blame themselves.' },
+      { t: '“Mm-hm. Tell me more about that.”', p: 0, best: true,
+        r: 'Riley: “It’s just… nothing tells me why I can’t unlock it.”', why: 'Stay neutral and accept the frustration. It points you to the real problem.' },
+      { t: '“Totally agree. My teammate designed this part.”', p: 2, tag: 'Biasing the participant',
+        r: 'Riley laughs and starts roasting every screen for fun.', why: 'Now they’re performing for you. Feedback that’s exaggerated to entertain you is as unreliable as feedback that’s softened.' },
+    ],
+  },
+  {
+    ctx: 'Task 2: “Find out what a 45-minute ride costs.” Riley is on the pricing screen.',
+    say: 'So 45 minutes is… $3.75? Wait, or is it charged per 30 minutes? I’m not sure.',
+    prompt: 'You respond:',
+    opts: [
+      { t: '“Close, it’s $4.50 because it rounds up.”', p: 4, tag: 'Helping',
+        r: 'Riley: “Ohh. That’s sneaky.”', why: 'You answered the task for them. You were supposed to find out whether the pricing is understandable.' },
+      { t: '“Are you sure? Look again.”', p: 3, tag: 'Leading question',
+        r: 'Riley quickly changes the answer to something else.', why: 'This signals that they’re wrong. They’ll start guessing what you want to hear.' },
+      { t: '“Take your time. Tell me your answer when you’re done.”', p: 0, best: true,
+        r: 'Riley: “I’ll say $3.75, but I’m not confident.”', why: 'Neutral. Now you have evidence that the pricing is unclear.' },
+      { t: '“Would a clearer pricing table help you here?”', p: 3, tag: 'Leading question',
+        r: 'Riley: “Uh, yeah, sure, I guess?”', why: 'This asks them to judge your solution in the middle of a task, and it leads them toward yes.' },
+    ],
+  },
+  {
+    ctx: 'Back on Task 1. Riley has been stuck on the payment step for 6 minutes and looks frustrated.',
+    say: 'I really, really can’t figure out how to unlock this.',
+    prompt: 'You respond:',
+    opts: [
+      { t: '(Take the mouse.) “Here, let me just do it.”', p: 4, tag: 'Taking over',
+        r: 'Riley watches, feeling a little embarrassed.', why: 'Now you’re testing yourself. You have also shown that the participant failed.' },
+      { t: '“Keep trying. We have all day.”', p: 3, tag: 'Ignoring distress',
+        r: 'Riley shifts in their seat and looks at the door.', why: 'Participants can quit at any time, and their wellbeing comes first. Don’t trap them.' },
+      { t: '“Everyone else found it in under a minute.”', p: 4, tag: 'Comparing to others',
+        r: 'Riley: “…Great.”', why: 'This is both untrue and harmful. Never compare participants to each other.' },
+      { t: '“That’s really helpful to see. Let’s move on to the next task.”', p: 0, best: true,
+        r: 'Riley exhales: “Thank you.”', why: 'Once they’re hopelessly stuck, note the failure and move on. Being stuck is a finding, not their fault.' },
+    ],
+  },
+  {
+    ctx: 'All tasks are done. Time for the debrief.',
+    say: 'Okay, I think that’s everything?',
+    prompt: 'You ask:',
+    opts: [
+      { t: '“So you liked the app overall, right?”', p: 3, tag: 'Leading question',
+        r: 'Riley: “Yeah, sure, it was fine!”', why: 'A leading yes/no question gets you a polite, useless answer.' },
+      { t: '“Thanks, that’s all!” (End the session.)', p: 2, tag: 'Skipping the debrief',
+        r: 'Riley leaves. Your notes say “unlock??” with no explanation.', why: 'The debrief is where you ask why. You lose that insight.' },
+      { t: '“Earlier you paused on the Unlock button. What did you expect to happen?”', p: 0, best: true,
+        r: 'Riley: “I thought it would ask me to pay, not just sit there gray.”', why: 'A specific, open question about something you observed. Now you know their mental model.' },
+      { t: '“Would you use this app more if we added a dark mode?”', p: 2, tag: 'Hypothetical question',
+        r: 'Riley: “Probably? I like dark mode.”', why: 'People are bad at predicting what they would do in the future. Ask about what actually happened.' },
+    ],
+  },
+];
+const MAX = ROUNDS.reduce((s, r) => s + Math.max(...r.opts.map(o => o.p)), 0);
+const RANKS = [
+  [0.85, 'Usability Saboteur', 'Riley will never volunteer for a study again. Your findings are worthless, and the session was a masterpiece of what not to do.'],
+  [0.6, 'Chaos Moderator', 'You biased, rescued, and rushed your way through. Most of your data is contaminated.'],
+  [0.3, 'Accidentally Helpful', 'You kept slipping into good habits. Riley may have said something useful.'],
+  [0, 'Annoyingly Good Facilitator', 'You were supposed to be bad. Instead you ran a clean think-aloud. Disqualified, but hire this person.'],
+];
+
+let i = -1, score = 0; const picks = [];
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+document.getElementById('max').textContent = MAX;
+
+function hud() {
+  document.getElementById('hud').hidden = i < 0;
+  document.getElementById('pts').textContent = score;
+  document.getElementById('bar').style.width = (100 * score / MAX) + '%';
+}
+
+function intro() {
+  i = -1; score = 0; picks.length = 0; hud();
+  app.innerHTML = `
+    <p class="round-label">Think-aloud training · EECS 493</p>
+    <h1>Be the <em>worst</em> facilitator.</h1>
+    <p class="lede">You're running a think-aloud session. Your goal is to ruin it. Every choice that biases, rescues, or rattles the participant earns bias points. The highest score wins.</p>
+    <dl class="brief">
+      <dt>Participant</dt><dd>Riley, a sophomore who has never used the app.</dd>
+      <dt>Product</dt><dd>Pedal, a campus bike-share app (prototype).</dd>
+      <dt>Tasks</dt><dd>1. Rent a bike from the station nearest the student union.<br>2. Find out what a 45-minute ride costs.</dd>
+      <dt>Rounds</dt><dd>${ROUNDS.length}. After each choice you'll see Riley's reaction and what a good facilitator would have done.</dd>
+    </dl>
+    <button class="go" id="start">Start the session</button>`;
+  document.getElementById('start').onclick = () => { i = 0; round(); };
+}
+
+function round() {
+  hud();
+  const R = ROUNDS[i];
+  app.innerHTML = `
+    <p class="round-label">Round ${i + 1} of ${ROUNDS.length}</p>
+    <p class="context">${esc(R.ctx)}</p>
+    <div class="bubble"><span class="who">RILEY</span>${esc(R.say)}</div>
+    <p class="prompt">${esc(R.prompt)}</p>
+    <div class="opts">${R.opts.map((o, k) => `<button class="opt" data-k="${k}">${esc(o.t)}</button>`).join('')}</div>
+    <div id="verdict"></div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(Number(b.dataset.k)));
+  app.querySelector('.opt').focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
+}
+
+function choose(k) {
+  const R = ROUNDS[i], o = R.opts[k], best = R.opts.find(x => x.best);
+  score += o.p; picks.push({ round: i, k });
+  hud();
+  app.querySelectorAll('.opt').forEach((b, j) => {
+    b.disabled = true;
+    if (j === k) b.classList.add('picked');
+    else if (R.opts[j].best) b.classList.add('best');
+  });
+  const v = document.getElementById('verdict');
+  v.innerHTML = `
+    <div class="verdict" role="status">
+      <div class="pts ${o.p ? 'bad' : 'zero'}">${o.p ? `+${o.p} bias points` : '+0. That was good facilitation.'}</div>
+      <div>${o.tag ? `<span class="tag">${esc(o.tag)}</span>` : `<span class="tag goodtag">Good practice</span>`}</div>
+      <div class="reaction">${esc(o.r)}</div>
+      <div class="why">${esc(o.why)}</div>
+      ${o.best ? '' : `<div class="better"><b>Good facilitator:</b> ${esc(best.t)}</div>`}
+    </div>
+    <button class="next" id="next">${i + 1 < ROUNDS.length ? 'Next round →' : 'See your score →'}</button>`;
+  const n = document.getElementById('next');
+  n.onclick = () => { i++; i < ROUNDS.length ? round() : finish(); };
+  n.focus({ preventScroll: true });
+  v.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+}
+
+function finish() {
+  hud();
+  const frac = score / MAX;
+  const [, title, blurb] = RANKS.find(([t]) => frac >= t);
+  const tally = {};
+  picks.forEach(({ round, k }) => { const o = ROUNDS[round].opts[k]; if (o.tag) tally[o.tag] = (tally[o.tag] || 0) + 1; });
+  const sins = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+  app.innerHTML = `
+    <p class="round-label">Session over</p>
+    <div class="final-score">${score}<small> / ${MAX}</small></div>
+    <div class="rank">${title}</div>
+    <p class="lede">${blurb}</p>
+    ${sins.length ? `<h2>Your facilitator sins</h2><ul class="sins">${sins.map(([t, n]) => `<li><span>${esc(t)}</span><span>×${n}</span></li>`).join('')}</ul>` : ''}
+    <h2>What a good facilitator does</h2>
+    <div class="review">${ROUNDS.map(R => { const b = R.opts.find(x => x.best); return `<div>${esc(b.t)}<div class="small">${esc(b.why)}</div></div>`; }).join('')}</div>
+    <button class="next" id="again">Play again</button>`;
+  document.getElementById('again').onclick = intro;
+  window.scrollTo({ top: 0 });
+}
+
+intro();
+</script>
+
+</body>
+</html>
