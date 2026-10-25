@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}[hidden]{display:none!important}</style>
+<title>Larkspur To-Go</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --ink: #2a2622;
+  --muted: #776f66;
+  --line: #e6dfd5;
+  --brand: #b4532a;
+  --brand-soft: #f8e9e1;
+  --veg: #5b8a3c;
+  --vegan: #2f6b3a;
+  --chip-on: #e3e6ea;
+  --err: #b3261e;
+  --err-soft: #fdecea;
+  --ok: #2f6b3a;
+  --ok-soft: #e4f1e6;
+  --font: "Nunito Sans", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; }
+button { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.appbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.appbar-inner, main { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.appbar-inner { display: flex; align-items: center; gap: 24px; height: 60px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+.logo-mark { width: 30px; height: 30px; border-radius: 50%; background: var(--brand); display: grid; place-items: center; }
+.logo small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
+nav { display: flex; gap: 4px; flex: 1; }
+nav button { background: none; border: 0; padding: 8px 12px; border-radius: 99px; cursor: pointer; color: var(--muted); font-weight: 600; }
+nav button[aria-current="page"] { color: var(--brand); background: var(--brand-soft); }
+.avatar-wrap { position: relative; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; border: 0; background: #e2cfc0; font-weight: 700; font-size: 13px; cursor: pointer; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(40,30,20,.12); min-width: 220px; padding: 6px; z-index: 20; }
+.menu button, .menu .menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.menu button:hover { background: var(--bg); }
+.menu .menu-row { cursor: default; color: var(--muted); font-size: 13px; }
+.menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+
+main { padding-block: 24px 64px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 22px; align-items: start; }
+@media (max-width: 840px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.stations { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.st { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 7px 14px; cursor: pointer; font-weight: 600; }
+.st[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.station-h { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 18px 0 10px; }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer; }
+.item:hover { border-color: #d3c6b6; }
+.item-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.item-name { font-weight: 700; }
+.price { font-variant-numeric: tabular-nums; font-weight: 600; }
+.desc { color: var(--muted); font-size: 13.5px; line-height: 1.4; }
+.badges { display: flex; gap: 5px; }
+.badge { font-size: 11px; font-weight: 800; border-radius: 4px; padding: 1px 5px; color: #fff; }
+.badge.v { background: var(--veg); }
+.badge.vg { background: var(--vegan); }
+.badge.gf { background: #8a7a5c; }
+
+.bag { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: grid; gap: 12px; }
+.bag h2 { font-size: 17px; margin: 0; }
+.bag-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pickup-link { background: none; border: 0; padding: 0; color: var(--muted); font-size: 13px; cursor: pointer; }
+.times { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.time { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 0; font-size: 13px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.time[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.line { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+.line .small { display: block; }
+.rm { background: none; border: 0; color: var(--muted); font-size: 12px; padding: 0; cursor: pointer; text-decoration: underline; }
+.small { font-size: 12.5px; color: var(--muted); }
+.tiny { font-size: 11px; color: #a39a90; }
+.total { display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid var(--line); padding-top: 10px; }
+.btn { border: 0; background: var(--brand); color: #fff; padding: 11px 18px; border-radius: 99px; font-weight: 700; cursor: pointer; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 24px; color: var(--muted); text-align: center; }
+.err { background: var(--err-soft); color: var(--err); border-radius: 8px; padding: 9px 11px; font-size: 13px; font-family: ui-monospace, Menlo, monospace; }
+
+.review { max-width: 560px; display: grid; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; }
+.card h2 { font-size: 16px; margin: 0; }
+.pay { display: grid; gap: 8px; }
+.pay label { display: flex; gap: 10px; align-items: center; cursor: pointer; }
+.actions { display: grid; gap: 10px; justify-items: start; }
+
+.order { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; max-width: 640px; }
+.order-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.status { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--ok-soft); color: var(--ok); }
+.code { font-size: 30px; font-weight: 800; letter-spacing: .08em; }
+.when { background: none; border: 0; padding: 0; cursor: pointer; font-weight: 600; text-decoration: underline dotted #c9bfb3; text-underline-offset: 3px; }
+.order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+details.receipt summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+details.receipt .line { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+.modal-back { position: fixed; inset: 0; background: rgba(30,20,10,.35); display: grid; place-items: center; z-index: 40; padding: 16px; }
+.modal { background: var(--surface); border-radius: 14px; width: min(440px, 100%); max-height: min(520px, calc(100vh - 32px)); display: flex; flex-direction: column; overflow: hidden; }
+.modal-head { padding: 16px 18px 10px; border-bottom: 1px solid var(--line); }
+.modal-head h2 { margin: 0; font-size: 18px; }
+.modal-body { padding: 14px 18px; overflow-y: auto; display: grid; gap: 14px; }
+.modal-foot { padding: 12px 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.opt-h { font-size: 13px; font-weight: 700; margin: 0 0 6px; }
+.opts { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt { border: 1.5px solid var(--vegan); background: var(--surface); color: var(--vegan); border-radius: 99px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 600; }
+.opt[aria-pressed="true"] { background: var(--chip-on); border-color: var(--chip-on); color: var(--muted); }
+.x { background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 60; max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: up .2s ease-out; } @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } } }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="logo">
+      <div class="logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 3v8a3 3 0 0 0 6 0V3M9 3v18M17 3c-2 2-2 7 0 9v9"/></svg></div>
+      <div>Larkspur To-Go<small>Larkspur Commons · Mobile ordering</small></div>
+    </div>
+    <nav>
+      <button id="nav-menu" aria-current="page">Menu</button>
+      <button id="nav-orders">Orders</button>
+    </nav>
+    <div class="avatar-wrap">
+      <button class="avatar" id="avatar" aria-haspopup="true" aria-expanded="false">AK</button>
+      <div class="menu" id="avatar-menu" hidden></div>
+    </div>
+  </div>
+</header>
+
+<main id="view"></main>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+const SWIPE_VALUE = 9.00;
+const BADGE_TIP = { v: 'Plant-forward', vg: 'Plant-based', gf: 'No gluten ingredients' };
+const STATIONS = ['Grill', 'Bowls', 'Deli', 'Drinks'];
+const MENU = [
+  { id: 'burger', st: 'Grill', name: 'Classic Burger', price: 8.50, desc: 'Beef patty, cheddar, lettuce, tomato, brioche bun.', badges: [] },
+  { id: 'bean', st: 'Grill', name: 'Black Bean Burger', price: 8.75, desc: 'House black bean patty, pepper jack, brioche bun.', badges: ['v'] },
+  { id: 'tenders', st: 'Grill', name: 'Chicken Tenders', price: 8.25, desc: 'Three tenders with fries and a dipping sauce.', badges: [] },
+  { id: 'harvest', st: 'Bowls', name: 'Harvest Grain Bowl', price: 9.75, desc: 'Roasted squash, kale, chickpeas, tahini dressing.', badges: ['vg', 'gf'], base: true },
+  { id: 'tofu', st: 'Bowls', name: 'Teriyaki Tofu Bowl', price: 9.25, desc: 'Crispy tofu, broccoli, honey-teriyaki glaze.', badges: ['v'], base: true },
+  { id: 'paneer', st: 'Bowls', name: 'Paneer Tikka Bowl', price: 9.50, desc: 'Grilled paneer, spiced tomato sauce, cucumber.', badges: ['v', 'gf'], base: true },
+  { id: 'club', st: 'Deli', name: 'Turkey Club', price: 8.95, desc: 'Turkey, bacon, lettuce, tomato, mayo on sourdough.', badges: [] },
+  { id: 'falafel', st: 'Deli', name: 'Falafel Wrap', price: 8.75, desc: 'Falafel, pickled onion, cucumber, tahini.', badges: ['vg'] },
+  { id: 'caprese', st: 'Deli', name: 'Caprese Panini', price: 8.50, desc: 'Mozzarella, tomato, basil pesto on ciabatta.', badges: ['v'] },
+  { id: 'lemonade', st: 'Drinks', name: 'Lemonade', price: 2.25, desc: 'Fresh-squeezed, 16 oz.', badges: ['vg', 'gf'] },
+  { id: 'coldbrew', st: 'Drinks', name: 'Cold Brew', price: 2.75, desc: '16 oz. Add oat milk in the next step.', badges: ['vg', 'gf'], addons: [['Oat milk', 0.50]] },
+];
+const BASES = ['Brown rice', 'Quinoa', 'Greens'];
+const ADDONS = [['Extra tahini', 0.50], ['Avocado', 1.25], ['Pickled onion', 0]];
+const TIMES = ['11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15'];
+
+const state = {
+  view: 'menu', station: 'All', bag: [], pickup: 'ASAP', showTimes: false,
+  pay: null, error: '', orders: [], nextNo: 318,
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const money = n => '$' + n.toFixed(2);
+const badgeHTML = b => `<span class="badge ${b}" title="${BADGE_TIP[b]}">${b.toUpperCase()}</span>`;
+const lineTotal = l => l.price + l.addons.reduce((s, a) => s + a[1], 0);
+const subtotal = bag => bag.reduce((s, l) => s + lineTotal(l), 0);
+
+function renderMenu() {
+  const shown = state.station === 'All' ? STATIONS : [state.station];
+  $('#view').innerHTML = `
+    <h1>Order for pickup</h1>
+    <p class="sub">Larkspur Commons · Open today 11:00–14:30</p>
+    <div class="layout">
+      <section>
+        <div class="stations">${['All', ...STATIONS].map(s => `<button class="st" data-st="${s}" aria-pressed="${s === state.station}">${s}</button>`).join('')}</div>
+        ${shown.map(st => `<h2 class="station-h">${st}</h2><div class="items">${MENU.filter(m => m.st === st).map(m => `
+          <button class="item" data-item="${m.id}">
+            <div class="item-top"><span class="item-name">${m.name}</span><span class="price">${money(m.price)}</span></div>
+            <div class="desc">${m.desc}</div>
+            ${m.badges.length ? `<div class="badges">${m.badges.map(badgeHTML).join('')}</div>` : ''}
+          </button>`).join('')}</div>`).join('')}
+      </section>
+      <aside class="bag" aria-label="Your bag">${bagHTML()}</aside>
+    </div>`;
+  document.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { state.station = b.dataset.st; render(); });
+  document.querySelectorAll('[data-item]').forEach(b => b.onclick = () => openItem(MENU.find(m => m.id === b.dataset.item)));
+  wireBag();
+}
+
+function bagHTML() {
+  const n = state.bag.length;
+  return `
+    <div class="bag-head"><h2>Your bag${n ? ` (${n})` : ''}</h2>
+      <button class="pickup-link" id="pickup">Pickup: ${state.pickup === 'ASAP' ? 'ASAP (~40 min)' : state.pickup} ▾</button></div>
+    ${state.showTimes ? `<div class="times">${['ASAP', ...TIMES].map(t => `<button class="time" data-time="${t}" aria-pressed="${t === state.pickup}">${t}</button>`).join('')}</div>` : ''}
+    ${n ? state.bag.map((l, i) => `<div class="line"><span>${l.name}${l.base ? `<span class="small">${l.base}</span>` : ''}${l.addons.length ? `<span class="small">${l.addons.map(a => a[0]).join(', ')}</span>` : ''}
+        <button class="rm" data-rm="${i}">Remove</button></span><span class="price">${money(lineTotal(l))}</span></div>`).join('')
+      : `<p class="small" style="margin:0">Your bag is empty.</p>`}
+    ${n ? `<div class="total"><span>Subtotal</span><span>${money(subtotal(state.bag))}</span></div>
+      <button class="btn" id="continue">Continue</button>` : ''}`;
+}
+
+function wireBag() {
+  $('#pickup').onclick = () => { state.showTimes = !state.showTimes; render(); };
+  document.querySelectorAll('[data-time]').forEach(b => b.onclick = () => { state.pickup = b.dataset.time; state.showTimes = false; render(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { state.bag.splice(Number(b.dataset.rm), 1); render(); });
+  const c = $('#continue'); if (c) c.onclick = () => { state.view = 'review'; state.error = ''; render(); };
+}
+
+function openItem(m) {
+  const sel = { base: null, addons: new Set() };
+  const addons = m.addons || (m.st === 'Drinks' ? [] : ADDONS);
+  const draw = (err) => {
+    $('#modal-root').innerHTML = `
+      <div class="modal-back" id="back"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mh">
+        <div class="modal-head"><div class="row" style="display:flex;justify-content:space-between;align-items:center"><h2 id="mh">${m.name}</h2><button class="x" id="close" aria-label="Close">×</button></div>
+          <div class="small">${money(m.price)}</div></div>
+        <div class="modal-body" id="mbody">
+          ${err ? `<div class="err">${err}</div>` : ''}
+          <div class="desc">${m.desc}</div>
+          ${m.badges.length ? `<div class="badges">${m.badges.map(badgeHTML).join('')}</div>` : ''}
+          ${addons.length ? `<div><p class="opt-h">Add-ons</p><div class="opts">${addons.map(([a, p]) => `<button class="opt" data-addon="${a}" aria-pressed="${sel.addons.has(a)}">${a}${p ? ` +${money(p)}` : ''}</button>`).join('')}</div></div>` : ''}
+          <div><p class="opt-h">Special instructions</p><textarea rows="2" style="width:100%;font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Allergies? Let staff know at pickup."></textarea></div>
+          ${m.base ? `<div><p class="opt-h">Base</p><div class="opts">${BASES.map(b => `<button class="opt" data-base="${b}" aria-pressed="${sel.base === b}">${b}</button>`).join('')}</div></div>` : ''}
+        </div>
+        <div class="modal-foot"><span class="small">Qty 1</span><button class="btn" id="add">Add to bag</button></div>
+      </div></div>`;
+    $('#close').onclick = close;
+    $('#back').onclick = e => { if (e.target.id === 'back') close(); };
+    document.querySelectorAll('[data-addon]').forEach(b => b.onclick = () => { const a = b.dataset.addon; sel.addons.has(a) ? sel.addons.delete(a) : sel.addons.add(a); const top = $('#mbody').scrollTop; draw(err); $('#mbody').scrollTop = top; });
+    document.querySelectorAll('[data-base]').forEach(b => b.onclick = () => { sel.base = b.dataset.base; const top = $('#mbody').scrollTop; draw(err); $('#mbody').scrollTop = top; });
+    $('#add').onclick = () => {
+      if (m.base && !sel.base) { const top = $('#mbody').scrollTop; draw('ERR 422: modifier group "BASE" requires min=1.'); $('#mbody').scrollTop = top; return; }
+      state.bag.push({ id: m.id, name: m.name, price: m.price, base: sel.base, addons: addons.filter(([a]) => sel.addons.has(a)) });
+      close(); render(); toast(`Added ${m.name}`);
+    };
+  };
+  const close = () => { $('#modal-root').innerHTML = ''; };
+  draw('');
+}
+
+function renderReview() {
+  const sub = subtotal(state.bag);
+  $('#view').innerHTML = `
+    <h1>Review your order</h1>
+    <p class="sub">Larkspur Commons · Pickup ${state.pickup === 'ASAP' ? 'ASAP (~40 min)' : state.pickup}</p>
+    <div class="review">
+      <div class="card"><h2>Items</h2>
+        ${state.bag.map(l => `<div class="line"><span>${l.name}${l.base ? ` · ${l.base}` : ''}${l.addons.length ? ` · ${l.addons.map(a => a[0]).join(', ')}` : ''}</span><span class="price">${money(lineTotal(l))}</span></div>`).join('')}
+        <div class="total"><span>Total</span><span>${money(sub)}</span></div>
+      </div>
+      <div class="card"><h2>Pay with</h2>
+        <div class="pay">
+          <label><input type="radio" name="pay" value="swipe" ${state.pay === 'swipe' ? 'checked' : ''}> Meal swipe</label>
+          <label><input type="radio" name="pay" value="dd" ${state.pay === 'dd' ? 'checked' : ''}> Dining Dollars</label>
+          <label><input type="radio" name="pay" value="card" ${state.pay === 'card' ? 'checked' : ''}> Card ending 4417</label>
+        </div>
+        ${state.pay === 'swipe' ? `<div class="tiny">Swipe equivalency applies. Overage tendered to DD.</div>` : ''}
+      </div>
+      ${state.error ? `<div class="err">${esc(state.error)}</div>` : ''}
+      <div class="actions">
+        <button class="btn" id="fav">★ Save as favorite</button>
+        <button class="btn ghost" id="place">Place order</button>
+        <button class="rm" id="back-menu">Back to menu</button>
+      </div>
+    </div>`;
+  document.querySelectorAll('[name="pay"]').forEach(r => r.onchange = () => { state.pay = r.value; state.error = ''; render(); });
+  $('#fav').onclick = () => toast('Saved to favorites');
+  $('#back-menu').onclick = () => { state.view = 'menu'; render(); };
+  $('#place').onclick = () => {
+    if (!state.pay) { state.error = 'PMT-03: Tender not specified.'; return render(); }
+    const swipe = state.pay === 'swipe' ? Math.min(SWIPE_VALUE, sub) : 0;
+    const dd = state.pay === 'dd' ? sub : (state.pay === 'swipe' ? Math.max(0, sub - SWIPE_VALUE) : 0);
+    const card = state.pay === 'card' ? sub : 0;
+    state.orders.unshift({ no: state.nextNo++, code: 'L' + Math.floor(100 + Math.random() * 900), items: state.bag, pickup: state.pickup === 'ASAP' ? '12:10' : state.pickup, total: sub, swipe, dd, card, editing: false });
+    state.bag = []; state.pay = null; state.pickup = 'ASAP';
+    state.view = 'orders'; render();
+    toast('Order received');
+  };
+}
+
+function renderOrders() {
+  $('#view').innerHTML = `
+    <h1>Orders</h1>
+    <p class="sub">Show your pickup code at the Larkspur Commons pickup shelf.</p>
+    <div style="display:grid;gap:12px">
+    ${state.orders.length ? state.orders.map(o => `
+      <div class="order">
+        <div class="order-top"><div><div class="small">Order #${o.no} · Pickup <button class="when" data-when="${o.no}">${o.pickup}</button></div>
+          <div class="code">${o.code}</div></div><span class="status">Received</span></div>
+        ${o.editing ? `<div class="times">${TIMES.map(t => `<button class="time" data-newtime="${o.no}|${t}" aria-pressed="${t === o.pickup}">${t}</button>`).join('')}</div>` : ''}
+        <div class="small">${o.items.map(l => l.name).join(', ')}</div>
+        <div class="order-actions"><button class="btn ghost" data-edit="${o.no}">Edit items</button><button class="btn ghost" data-help="${o.no}">Get help</button></div>
+        <details class="receipt"><summary>Receipt</summary>
+          <div class="line"><span>Total</span><span>${money(o.total)}</span></div>
+          ${o.swipe ? `<div class="line"><span>Swipe</span><span>${money(o.swipe)}</span></div>` : ''}
+          ${o.dd ? `<div class="line"><span>DD</span><span>${money(o.dd)}</span></div>` : ''}
+          ${o.card ? `<div class="line"><span>Card</span><span>${money(o.card)}</span></div>` : ''}
+        </details>
+      </div>`).join('') : `<div class="empty">No orders yet today.</div>`}
+    </div>`;
+  document.querySelectorAll('[data-when]').forEach(b => b.onclick = () => { const o = state.orders.find(x => x.no === Number(b.dataset.when)); o.editing = !o.editing; render(); });
+  document.querySelectorAll('[data-newtime]').forEach(b => b.onclick = () => {
+    const [no, t] = b.dataset.newtime.split('|'); const o = state.orders.find(x => x.no === Number(no));
+    o.pickup = t; o.editing = false; render(); toast('Updated');
+  });
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => toast("Items can't be changed once the kitchen has received your order."));
+  document.querySelectorAll('[data-help]').forEach(b => b.onclick = () => toast('Please see a staff member at the pickup counter.'));
+}
+
+function render() {
+  const top = state.view === 'orders' ? 'orders' : 'menu';
+  $('#nav-menu').toggleAttribute('aria-current', top === 'menu');
+  $('#nav-orders').toggleAttribute('aria-current', top === 'orders');
+  if (top === 'menu') $('#nav-menu').setAttribute('aria-current', 'page'); else $('#nav-orders').setAttribute('aria-current', 'page');
+  if (state.view === 'menu') renderMenu();
+  else if (state.view === 'review') renderReview();
+  else renderOrders();
+}
+
+let toastTimer;
+function toast(msg) {
+  clearTimeout(toastTimer);
+  $('#toast-root').innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  toastTimer = setTimeout(() => $('#toast-root').innerHTML = '', 2600);
+}
+
+function closeMenus() { $('#avatar-menu').hidden = true; $('#avatar').setAttribute('aria-expanded', 'false'); }
+$('#avatar').onclick = e => {
+  e.stopPropagation();
+  const m = $('#avatar-menu'); const open = m.hidden; closeMenus();
+  if (open) {
+    const dd = 142.50 - state.orders.reduce((s, o) => s + o.dd, 0);
+    const sw = 9 - state.orders.filter(o => o.swipe).length;
+    m.innerHTML = `<div class="menu-row"><strong style="color:var(--ink)">Alex K.</strong><br>Blue 14 plan</div><hr>
+      <div class="menu-row">Swipes: ${sw} this week<br>DD: ${money(dd)}</div><hr>
+      <button>Settings</button><button>Sign out</button>`;
+    m.hidden = false; $('#avatar').setAttribute('aria-expanded', 'true');
+  }
+};
+document.addEventListener('click', e => { if (!e.target.closest('.menu')) closeMenus(); });
+$('#nav-menu').onclick = () => { state.view = 'menu'; render(); };
+$('#nav-orders').onclick = () => { state.view = 'orders'; render(); };
+
+render();
+</script>
+</body>
+</html>
