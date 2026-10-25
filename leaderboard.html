@@ -81,7 +81,7 @@ h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0 0
       <h1>Worst Facilitator <em>leaderboard</em></h1>
     </div>
     <div class="status">
-      <div class="players" id="players">0 <small>players</small></div>
+      <div class="players" id="players">0 <small>teams</small></div>
       <button class="toggle" id="names" aria-pressed="false">Hide names</button>
     </div>
   </header>
@@ -107,9 +107,9 @@ document.getElementById('names').onclick = e => {
 
 function render(rows) {
   lastRows = rows;
-  document.getElementById('players').innerHTML = `${rows.length} <small>player${rows.length === 1 ? '' : 's'}</small>`;
+  document.getElementById('players').innerHTML = `${rows.length} <small>team${rows.length === 1 ? '' : 's'}</small>`;
   if (!rows.length) {
-    board.innerHTML = `<div class="empty">Waiting for the first scores. Open <code>${GAME_URL}</code> and play a round.</div>`;
+    board.innerHTML = `<div class="empty">Waiting for the first scores. Open <code>${GAME_URL}</code> and play as a team.</div>`;
     return;
   }
   const top = [...rows].sort((a, b) => b.score - a.score || a.t - b.t).slice(0, 10);
@@ -124,11 +124,11 @@ function render(rows) {
   board.innerHTML = `
     <div class="grid">
       <section>
-        <h2>Top saboteurs</h2>
+        <h2>Top saboteur teams</h2>
         <ol class="top">${top.map((row, n) => {
           const rank = RANKS.find(([t]) => row.score / MAX >= t)[1];
           return `<li><span class="pos">#${n + 1}</span>
-            <span class="who"><b>${hideNames ? 'Player ' + (n + 1) : esc(row.name)}</b><span>${rank}</span></span>
+            <span class="who"><b>${hideNames ? 'Team ' + (n + 1) : esc(row.name)}</b><span>${rank}</span></span>
             <span class="pts">${row.score}</span></li>`;
         }).join('')}</ol>
       </section>

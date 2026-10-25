@@ -119,7 +119,7 @@ const RANKS = [
 
 let i = -1, score = 0; const picks = [];
 let nickname = '';
-try { nickname = localStorage.getItem('wf-nick') || ''; } catch (e) {}
+try { nickname = localStorage.getItem('wf-team') || ''; } catch (e) {}
 const app = document.getElementById('app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 document.getElementById('max').textContent = MAX;
@@ -135,21 +135,22 @@ function intro() {
   app.innerHTML = `
     <p class="course">EECS 493: User Interface Development</p>
     <h1>Be the <em>worst</em> facilitator.</h1>
-    <p class="lede">You're running a think-aloud session. Your goal is to ruin it. Every choice that biases, rescues, or rattles the participant earns bias points. The highest score wins.</p>
+    <p class="lede">You and your partner are running a think-aloud session together. Your goal is to ruin it. Every choice that biases, rescues, or rattles the participant earns bias points. The highest score wins.</p>
     <dl class="brief">
       <dt>Participant</dt><dd>Riley, a sophomore who has never used the app.</dd>
       <dt>Product</dt><dd>Pedal, a campus bike-share app (prototype).</dd>
       <dt>Tasks</dt><dd>1. Rent a bike from the station nearest the student union.<br>2. Find out what a 45-minute ride costs.</dd>
+      <dt>How to play</dt><dd>In pairs, on one screen. Talk it over and agree before each pick.</dd>
       <dt>Rounds</dt><dd>${ROUNDS.length}. After each choice you'll see Riley's reaction and what a good facilitator would have done.</dd>
     </dl>
-    ${BOARD_URL ? `<div class="nick"><label for="nick">Nickname for the class leaderboard</label>
-      <input id="nick" maxlength="24" autocomplete="off" placeholder="e.g. Captain Leading Question" value="${esc(nickname)}"></div>` : ''}
+    ${BOARD_URL ? `<div class="nick"><label for="nick">Team name for the class leaderboard</label>
+      <input id="nick" maxlength="24" autocomplete="off" placeholder="e.g. The Leading Questions" value="${esc(nickname)}"></div>` : ''}
     <button class="go" id="start">Start the session</button>`;
   document.getElementById('start').onclick = () => {
     const field = document.getElementById('nick');
     if (field) {
       nickname = field.value.trim();
-      try { localStorage.setItem('wf-nick', nickname); } catch (e) {}
+      try { localStorage.setItem('wf-team', nickname); } catch (e) {}
     }
     i = 0; round();
   };
@@ -207,8 +208,8 @@ function finish() {
     <div class="final-score">${score}<small> / ${MAX}</small></div>
     <div class="rank">${title}</div>
     <p class="lede">${blurb}</p>
-    ${sins.length ? `<h2>Your facilitator sins</h2><ul class="sins">${sins.map(([t, n]) => `<li><span>${esc(t)}</span><span>×${n}</span></li>`).join('')}</ul>` : ''}
-    ${BOARD_URL ? '<div class="class-rank" id="class-rank" role="status">Posting your score to the class leaderboard…</div>' : ''}
+    ${sins.length ? `<h2>Your team's facilitator sins</h2><ul class="sins">${sins.map(([t, n]) => `<li><span>${esc(t)}</span><span>×${n}</span></li>`).join('')}</ul>` : ''}
+    ${BOARD_URL ? '<div class="class-rank" id="class-rank" role="status">Posting your team&rsquo;s score to the class leaderboard…</div>' : ''}
     <h2>What a good facilitator does</h2>
     <div class="review">${ROUNDS.map(R => { const b = R.opts.find(x => x.best); return `<div>${esc(b.t)}<div class="small">${esc(b.why)}</div></div>`; }).join('')}</div>
     <button class="next" id="again">Play again</button>`;
@@ -219,14 +220,14 @@ function finish() {
 
 async function postScore() {
   const box = document.getElementById('class-rank');
-  const mine = { name: nickname || 'Anonymous', score, picks: picks.map(p => p.k) };
+  const mine = { name: nickname || 'Anonymous team', score, picks: picks.map(p => p.k) };
   try {
     await boardSubmit(mine);
     const rows = await boardFetch();
     const better = rows.filter(r => r.score > score).length;
-    if (box) box.innerHTML = `You're <b>#${better + 1}</b> of ${rows.length} in class so far. Watch the leaderboard on the big screen.`;
+    if (box) box.innerHTML = `Your team is <b>#${better + 1}</b> of ${rows.length} so far. Watch the leaderboard on the big screen.`;
   } catch (e) {
-    if (box) box.textContent = "Couldn't reach the class leaderboard. Your score is still shown above.";
+    if (box) box.textContent = "Couldn't reach the class leaderboard. Your team's score is still shown above.";
   }
 }
 
