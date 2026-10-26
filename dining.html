@@ -163,7 +163,7 @@ const MENU = [
 ];
 const BASES = ['Brown rice', 'Quinoa', 'Greens'];
 const ADDONS = [['Extra tahini', 0.50], ['Avocado', 1.25], ['Pickled onion', 0]];
-const TIMES = ['11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00', '14:15'];
+const TIMES = ['11:30 AM', '11:45 AM', '12:00 PM', '12:15 PM', '12:30 PM', '12:45 PM', '1:00 PM', '1:15 PM', '1:30 PM', '1:45 PM', '2:00 PM', '2:15 PM'];
 
 const state = {
   view: 'menu', station: 'All', bag: [], pickup: 'ASAP', showTimes: false,
@@ -180,7 +180,7 @@ function renderMenu() {
   const shown = state.station === 'All' ? STATIONS : [state.station];
   $('#view').innerHTML = `
     <h1>Order for pickup</h1>
-    <p class="sub">Larkspur Commons · Open today 11:00–14:30</p>
+    <p class="sub">Larkspur Commons · Open today 11:00 AM–2:30 PM</p>
     <div class="layout">
       <section>
         <div class="stations">${['All', ...STATIONS].map(s => `<button class="st" data-st="${s}" aria-pressed="${s === state.station}">${s}</button>`).join('')}</div>
@@ -283,7 +283,7 @@ function renderReview() {
     const swipe = state.pay === 'swipe' ? Math.min(SWIPE_VALUE, sub) : 0;
     const dd = state.pay === 'dd' ? sub : (state.pay === 'swipe' ? Math.max(0, sub - SWIPE_VALUE) : 0);
     const card = state.pay === 'card' ? sub : 0;
-    state.orders.unshift({ no: state.nextNo++, code: 'L' + Math.floor(100 + Math.random() * 900), items: state.bag, pickup: state.pickup === 'ASAP' ? '12:10' : state.pickup, total: sub, swipe, dd, card, editing: false });
+    state.orders.unshift({ no: state.nextNo++, code: 'L' + Math.floor(100 + Math.random() * 900), items: state.bag, pickup: state.pickup === 'ASAP' ? '12:10 PM' : state.pickup, total: sub, swipe, dd, card, editing: false });
     state.bag = []; state.pay = null; state.pickup = 'ASAP';
     state.view = 'orders'; render();
     toast('Order received');
