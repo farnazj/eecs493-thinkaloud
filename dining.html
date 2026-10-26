@@ -214,7 +214,7 @@ function bagHTML() {
 function wireBag() {
   $('#pickup').onclick = () => { state.showTimes = !state.showTimes; render(); };
   document.querySelectorAll('[data-time]').forEach(b => b.onclick = () => { state.pickup = b.dataset.time; state.showTimes = false; render(); });
-  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { state.bag.splice(Number(b.dataset.rm), 1); render(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { state.bag = []; render(); });
   const c = $('#continue'); if (c) c.onclick = () => { state.view = 'review'; state.error = ''; render(); };
 }
 
